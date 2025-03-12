@@ -1,0 +1,11 @@
+{
+  "packages": [
+    "pango",
+    "libffi",
+    "cairo",
+    "gobject-introspection",
+    "libxml2",
+    "libxslt",
+    "shared-mime-info"
+  ]
+} 
