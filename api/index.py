@@ -8,17 +8,31 @@ from sklearn.model_selection import train_test_split
 from weasyprint import HTML
 import os
 import logging
+import sys
+
+# Add the parent directory to Python path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)
 
 # Update paths to be relative to the api directory
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+app.logger.info(f"Base directory: {BASE_DIR}")
 
 try:
     # --- Data Loading and Model Training ---
-    training = pd.read_csv(os.path.join(BASE_DIR, 'Data/Training.csv'))
-    app.logger.info(f"Successfully loaded training data from {os.path.join(BASE_DIR, 'Data/Training.csv')}")
+    training_path = os.path.join(BASE_DIR, 'Data', 'Training.csv')
+    app.logger.info(f"Attempting to load training data from: {training_path}")
+    
+    if not os.path.exists(training_path):
+        app.logger.error(f"Training data file not found at: {training_path}")
+        app.logger.info(f"Current working directory: {os.getcwd()}")
+        app.logger.info(f"Directory contents: {os.listdir(BASE_DIR)}")
+        raise FileNotFoundError(f"Training data not found at {training_path}")
+        
+    training = pd.read_csv(training_path)
+    app.logger.info("Successfully loaded training data")
     
     cols = training.columns[:-1]  # All symptom columns
     x = training[cols]
@@ -36,6 +50,7 @@ try:
 
     # List of symptoms for the input vector and to populate the form
     symptoms_list = list(cols)
+    app.logger.info(f"Loaded {len(symptoms_list)} symptoms")
 except Exception as e:
     app.logger.error(f"Error loading training data: {str(e)}")
     symptoms_list = []
@@ -48,40 +63,46 @@ precautionDictionary = {}
 def load_severity_dict():
     global severityDictionary
     try:
-        with open(os.path.join(BASE_DIR, 'MasterData/symptom_severity.csv'), newline='', encoding='utf-8') as csv_file:
+        severity_path = os.path.join(BASE_DIR, 'MasterData', 'symptom_severity.csv')
+        app.logger.info(f"Loading severity data from: {severity_path}")
+        with open(severity_path, newline='', encoding='utf-8') as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=',')
             for row in csv_reader:
                 if row:
                     symptom, severity = row[0], row[1]
                     severityDictionary[symptom] = int(severity)
-        app.logger.info("Successfully loaded severity dictionary")
+        app.logger.info(f"Loaded {len(severityDictionary)} severity entries")
     except Exception as e:
         app.logger.error(f"Error loading severity dictionary: {str(e)}")
 
 def load_description():
     global description_list
     try:
-        with open(os.path.join(BASE_DIR, 'MasterData/symptom_Description.csv'), newline='', encoding='utf-8') as csv_file:
+        desc_path = os.path.join(BASE_DIR, 'MasterData', 'symptom_Description.csv')
+        app.logger.info(f"Loading description data from: {desc_path}")
+        with open(desc_path, newline='', encoding='utf-8') as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=',')
             for row in csv_reader:
                 if row:
                     symptom, desc = row[0], row[1]
                     description_list[symptom] = desc
-        app.logger.info("Successfully loaded description list")
+        app.logger.info(f"Loaded {len(description_list)} descriptions")
     except Exception as e:
         app.logger.error(f"Error loading description list: {str(e)}")
 
 def load_precaution_dict():
     global precautionDictionary
     try:
-        with open(os.path.join(BASE_DIR, 'MasterData/symptom_precaution.csv'), newline='', encoding='utf-8') as csv_file:
+        precaution_path = os.path.join(BASE_DIR, 'MasterData', 'symptom_precaution.csv')
+        app.logger.info(f"Loading precaution data from: {precaution_path}")
+        with open(precaution_path, newline='', encoding='utf-8') as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=',')
             for row in csv_reader:
                 if row:
                     symptom = row[0]
                     precautions = row[1:5]  # Assumes 4 precaution entries per symptom
                     precautionDictionary[symptom] = precautions
-        app.logger.info("Successfully loaded precaution dictionary")
+        app.logger.info(f"Loaded {len(precautionDictionary)} precaution entries")
     except Exception as e:
         app.logger.error(f"Error loading precaution dictionary: {str(e)}")
 
@@ -99,7 +120,13 @@ def calc_condition(selected_symptoms, days):
 
 @app.route('/health')
 def health_check():
-    return {"status": "healthy"}, 200
+    return {
+        "status": "healthy",
+        "symptoms_loaded": len(symptoms_list) > 0,
+        "severity_loaded": len(severityDictionary) > 0,
+        "descriptions_loaded": len(description_list) > 0,
+        "precautions_loaded": len(precautionDictionary) > 0
+    }
 
 # --- Routes ---
 @app.route('/', methods=['GET', 'POST'])
