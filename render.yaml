@@ -12,6 +12,7 @@ services:
       libffi-dev \
       shared-mime-info \
       && pip install --upgrade pip \
+      && pip install --only-binary :all: numpy pandas scikit-learn \
       && pip install --no-cache-dir -r requirements.txt
     startCommand: gunicorn --chdir api index:app --bind 0.0.0.0:$PORT --log-file -
     envVars:
@@ -24,9 +25,9 @@ services:
       - key: PYTHONPATH
         value: .
       - key: PIP_DISABLE_PIP_VERSION_CHECK
-        value: 1
+        value: "1"
       - key: SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL
-        value: True
+        value: "True"
     healthCheckPath: /health
     autoDeploy: true
     disk:
