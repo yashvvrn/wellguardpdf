@@ -3,13 +3,23 @@ services:
     name: disease-prediction-system
     env: python
     region: oregon
-    buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn api.index:app
+    plan: free
+    buildCommand: |
+      apt-get update && apt-get install -y \
+      libcairo2-dev \
+      libpango1.0-dev \
+      libgdk-pixbuf2.0-dev \
+      libffi-dev \
+      shared-mime-info \
+      && pip install -r requirements.txt
+    startCommand: gunicorn --bind 0.0.0.0:$PORT api.index:app
     envVars:
       - key: PYTHON_VERSION
         value: 3.9.0
       - key: FLASK_ENV
         value: production
+      - key: PORT
+        value: 10000
     healthCheckPath: /
     autoDeploy: true
     disk:
