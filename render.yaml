@@ -2,7 +2,7 @@ services:
   - type: web
     name: disease-prediction-system
     env: python
-    region: oregon
+    region: singapore
     plan: free
     buildCommand: |
       apt-get update && apt-get install -y \
@@ -12,7 +12,7 @@ services:
       libffi-dev \
       shared-mime-info \
       && pip install -r requirements.txt
-    startCommand: gunicorn --bind 0.0.0.0:$PORT api.index:app
+    startCommand: cd api && gunicorn index:app
     envVars:
       - key: PYTHON_VERSION
         value: 3.9.0
@@ -20,7 +20,7 @@ services:
         value: production
       - key: PORT
         value: 10000
-    healthCheckPath: /
+    healthCheckPath: /health
     autoDeploy: true
     disk:
       name: data
