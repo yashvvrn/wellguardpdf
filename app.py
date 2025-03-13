@@ -5,9 +5,15 @@ import csv
 from sklearn import preprocessing
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import train_test_split
-from weasyprint import HTML
+from weasyprint import HTML, CSS
 import os
 import sys
+import logging
+import tempfile
+
+# Configure logging
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 
@@ -172,37 +178,58 @@ def index():
 # --- Route for PDF Report Download ---
 @app.route('/download_report', methods=['POST'])
 def download_report():
-    # Retrieve data from form submission
-    name = request.form.get('name')
-    selected_symptoms = request.form.get('selected_symptoms')
-    days = request.form.get('days')
-    disease = request.form.get('disease')
-    description = request.form.get('description')
-    advice = request.form.get('advice')
-    precautions = request.form.getlist('precautions')
+    try:
+        # Retrieve data from form submission
+        name = request.form.get('name')
+        selected_symptoms = request.form.get('selected_symptoms')
+        days = request.form.get('days')
+        disease = request.form.get('disease')
+        description = request.form.get('description')
+        advice = request.form.get('advice')
+        precautions = request.form.getlist('precautions')
 
-    # Convert selected_symptoms to a list (if comma separated)
-    symptoms_from_form = selected_symptoms.split(", ") if selected_symptoms else []
+        logger.info(f"Generating PDF report for patient: {name}")
+        logger.debug(f"Form data: {request.form}")
 
-    result = {
-        "name": name,
-        "selected_symptoms": symptoms_from_form,
-        "days": days,
-        "disease": disease,
-        "description": description,
-        "precautions": precautions,
-        "advice": advice
-    }
-    
-    # Render the styled HTML report
-    rendered = render_template('report.html', result=result)
-    # Convert rendered HTML to PDF using WeasyPrint
-    pdf = HTML(string=rendered).write_pdf()
-    
-    response = make_response(pdf)
-    response.headers['Content-Type'] = 'application/pdf'
-    response.headers['Content-Disposition'] = 'attachment; filename=report.pdf'
-    return response
+        # Convert selected_symptoms to a list (if comma separated)
+        symptoms_from_form = selected_symptoms.split(", ") if selected_symptoms else []
+
+        result = {
+            "name": name,
+            "selected_symptoms": symptoms_from_form,
+            "days": days,
+            "disease": disease,
+            "description": description,
+            "precautions": precautions,
+            "advice": advice
+        }
+        
+        # Render the styled HTML report
+        rendered = render_template('report.html', result=result)
+        
+        # Create a temporary file for the PDF
+        with tempfile.NamedTemporaryFile(suffix='.pdf', delete=False) as tmp:
+            # Convert rendered HTML to PDF using WeasyPrint with error handling
+            logger.info("Starting PDF generation")
+            html = HTML(string=rendered, base_url=request.url_root)
+            html.write_pdf(tmp.name)
+            logger.info("PDF generation completed")
+            
+            # Read the generated PDF
+            with open(tmp.name, 'rb') as pdf_file:
+                pdf_content = pdf_file.read()
+            
+            # Clean up the temporary file
+            os.unlink(tmp.name)
+        
+        response = make_response(pdf_content)
+        response.headers['Content-Type'] = 'application/pdf'
+        response.headers['Content-Disposition'] = f'attachment; filename={name}_medical_report.pdf'
+        return response
+
+    except Exception as e:
+        logger.error(f"Error generating PDF: {str(e)}", exc_info=True)
+        return f"Error generating PDF report: {str(e)}", 500
 
 @app.route('/health')
 def health_check():

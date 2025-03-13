@@ -19,6 +19,10 @@ services:
       shared-mime-info \
       libcairo-gobject2 \
       libpangoft2-1.0-0 \
+      fonts-liberation \
+      libharfbuzz-dev \
+      libfreetype6-dev \
+      libfontconfig1-dev \
       && pip install --upgrade pip setuptools wheel \
       && pip install --only-binary :all: numpy==1.23.5 pandas==1.5.3 scikit-learn==1.3.0 \
       && pip install --no-cache-dir -r requirements.txt \
@@ -55,6 +59,8 @@ services:
         value: "1"
       - key: SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL
         value: "True"
+      - key: PYTHONPATH
+        value: /opt/render/project/src
     healthCheckPath: /health
     autoDeploy: true
     disk:
