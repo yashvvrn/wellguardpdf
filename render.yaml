@@ -25,6 +25,8 @@ services:
       && echo "Current directory: $(pwd)" \
       && echo "Listing current directory:" \
       && ls -la \
+      && echo "Listing MasterData directory:" \
+      && ls -la MasterData/ \
       && echo "Creating directories..." \
       && mkdir -p Data MasterData templates static \
       && echo "Copying Data files..." \
@@ -36,6 +38,8 @@ services:
       && echo "Verifying files:" \
       && ls -R Data/ \
       && ls -R MasterData/ \
+      && echo "Checking specific file:" \
+      && ls -l MasterData/Symptom_severity.csv \
       && echo "Build process completed"
     startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --log-file -
     envVars:

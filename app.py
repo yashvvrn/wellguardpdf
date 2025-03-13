@@ -21,7 +21,7 @@ def verify_data_files():
     """Verify the existence of required data files and print their status"""
     required_files = {
         'Data/Training.csv': False,
-        'MasterData/symptom_severity.csv': False,
+        'MasterData/Symptom_severity.csv': False,
         'MasterData/symptom_Description.csv': False,
         'MasterData/symptom_precaution.csv': False
     }
@@ -73,7 +73,7 @@ precautionDictionary = {}
 def load_severity_dict():
     global severityDictionary
     try:
-        severity_file = os.path.join(BASE_DIR, 'MasterData', 'symptom_severity.csv')
+        severity_file = os.path.join(BASE_DIR, 'MasterData', 'Symptom_severity.csv')
         print(f"Loading severity data from: {severity_file}")
         with open(severity_file, newline='', encoding='utf-8') as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=',')
