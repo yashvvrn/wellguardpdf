@@ -1,21 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Medical Report - {{ result.name }}</title>
+    <title>Disease Prediction Report - {{ result.name }}</title>
     <style>
         @page { 
             size: A4;
-            margin: 1.5cm;
-            @top-center {
-                content: "WellGuard Medical Report";
-                font-size: 10pt;
-                color: #2c3e50;
-            }
-            @bottom-center {
-                content: "Page " counter(page) " of " counter(pages);
-                font-size: 9pt;
-                color: #666;
-            }
+            margin: 2cm;
         }
         
         body {
@@ -24,152 +14,141 @@
             color: #333;
             max-width: 21cm;
             margin: 0 auto;
-            background-color: #f8f9fa;
+            background-color: white;
+            padding: 20px;
         }
 
         .header {
             text-align: center;
             margin-bottom: 2em;
-            padding: 2em;
-            background: linear-gradient(135deg, #2c3e50, #3498db);
+            padding: 1.5em;
+            background: linear-gradient(90deg, #ff7675 0%, #ffa94d 100%);
             color: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-radius: 15px;
         }
 
         .header h1 {
             margin: 0;
-            font-size: 28px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            font-size: 32px;
+            font-weight: bold;
         }
 
         .header p {
-            margin: 10px 0 0;
-            font-size: 16px;
-            opacity: 0.9;
+            margin: 5px 0 0;
+            font-size: 18px;
         }
 
-        .card {
-            background: white;
-            border-radius: 8px;
-            padding: 1.5em;
-            margin-bottom: 1.5em;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        .section {
+            margin-bottom: 2em;
         }
 
         h2 {
-            color: #2c3e50;
-            margin-top: 0;
-            border-bottom: 2px solid #e9ecef;
-            padding-bottom: 0.5em;
-            font-size: 20px;
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #ff7675;
+            padding-bottom: 5px;
         }
 
-        .patient-info {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1em;
+        .patient-details p {
+            margin: 8px 0;
+            font-size: 16px;
         }
 
-        .patient-info p {
-            margin: 0.5em 0;
-            padding: 0.5em;
-            background-color: #f8f9fa;
-            border-radius: 4px;
+        .label {
+            font-weight: bold;
+            display: inline-block;
+            min-width: 180px;
         }
 
-        .symptoms-list {
-            list-style: none;
-            padding: 0;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5em;
+        .diagnosis-table {
+            width: 100%;
+            margin: 15px 0;
+            border-collapse: collapse;
         }
 
-        .symptoms-list li {
-            background-color: #e9ecef;
-            padding: 0.5em 1em;
-            border-radius: 20px;
-            font-size: 14px;
-            color: #2c3e50;
+        .diagnosis-table td {
+            padding: 10px;
+            vertical-align: top;
         }
 
-        .diagnosis {
-            background-color: #f8f9fa;
-            padding: 1em;
-            border-left: 4px solid #2c3e50;
-            margin: 1em 0;
+        .diagnosis-label {
+            background-color: #ff7675;
+            color: white;
+            font-weight: bold;
+            width: 150px;
+            padding: 10px;
+        }
+
+        .diagnosis-content {
+            background-color: #fff;
+            padding: 10px;
         }
 
         .precautions-list {
-            list-style: none;
-            padding: 0;
+            list-style-type: disc;
+            margin: 0;
+            padding-left: 25px;
         }
 
         .precautions-list li {
-            margin-bottom: 0.8em;
-            padding: 0.8em;
-            background-color: #f8f9fa;
-            border-radius: 4px;
-            border-left: 3px solid #3498db;
+            margin-bottom: 10px;
+            line-height: 1.4;
         }
 
-        .advice-box {
-            background-color: #e8f4f8;
-            padding: 1em;
-            border-radius: 8px;
-            margin-top: 1em;
+        .medical-advice {
+            margin: 15px 0;
         }
 
         .footer {
             text-align: center;
             margin-top: 3em;
-            padding-top: 1.5em;
-            border-top: 1px solid #dee2e6;
-            color: #6c757d;
-            font-size: 12px;
+            padding: 1em;
+            background-color: #ffa94d;
+            color: white;
+            border-radius: 10px;
         }
 
-        .highlight {
-            color: #2c3e50;
-            font-weight: bold;
+        .disclaimer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+            padding: 0 50px;
         }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>Medical Report</h1>
-        <p>Generated for {{ result.name }}</p>
+        <h1>Disease Prediction Report</h1>
+        <p>WellGuard - Disease Prediction System</p>
     </div>
 
-    <div class="card">
-        <h2>Patient Information</h2>
-        <div class="patient-info">
-            <p><span class="highlight">Name:</span> {{ result.name }}</p>
-            <p><span class="highlight">Duration of Symptoms:</span> {{ result.days }} days</p>
+    <div class="section">
+        <h2>Patient Details</h2>
+        <div class="patient-details">
+            <p><span class="label">Name:</span> {{ result.name }}</p>
+            <p><span class="label">Reported Symptoms:</span> {{ ", ".join(result.selected_symptoms) }}</p>
+            <p><span class="label">Duration:</span> {{ result.days }} days</p>
         </div>
     </div>
 
-    <div class="card">
-        <h2>Symptoms Reported</h2>
-        <ul class="symptoms-list">
-            {% for symptom in result.selected_symptoms %}
-            <li>{{ symptom }}</li>
-            {% endfor %}
-        </ul>
-    </div>
-
-    <div class="card">
+    <div class="section">
         <h2>Diagnosis</h2>
-        <div class="diagnosis">
-            <p><span class="highlight">Predicted Condition:</span> {{ result.disease }}</p>
-            <p>{{ result.description }}</p>
-        </div>
+        <table class="diagnosis-table">
+            <tr>
+                <td class="diagnosis-label">Disease</td>
+                <td class="diagnosis-content">{{ result.disease }}</td>
+            </tr>
+            <tr>
+                <td class="diagnosis-label">Description</td>
+                <td class="diagnosis-content">{{ result.description }}</td>
+            </tr>
+        </table>
     </div>
 
-    <div class="card">
-        <h2>Recommended Precautions</h2>
+    <div class="section">
+        <h2>Precautions</h2>
         <ul class="precautions-list">
             {% for precaution in result.precautions %}
             <li>{{ precaution }}</li>
@@ -177,16 +156,19 @@
         </ul>
     </div>
 
-    <div class="card">
+    <div class="section">
         <h2>Medical Advice</h2>
-        <div class="advice-box">
-            <p>{{ result.advice }}</p>
+        <div class="medical-advice">
+            {{ result.advice }}
         </div>
     </div>
 
     <div class="footer">
-        <p>This is a computer-generated report and should not be considered as a substitute for professional medical advice.</p>
-        <p>Generated by WellGuard Health System</p>
+        Generated by WellGuard - Disease Prediction System
+    </div>
+
+    <div class="disclaimer">
+        This report is generated by an AI-based prediction system and is for informational purposes only. It should not be used as a substitute for professional medical advice, diagnosis, or treatment. Always consult a qualified healthcare provider with any questions or concerns regarding your health.
     </div>
 </body>
 </html>

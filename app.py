@@ -212,10 +212,8 @@ def download_report():
         
         # Create a temporary file for the PDF
         with tempfile.NamedTemporaryFile(suffix='.pdf', delete=False) as tmp:
-            # Generate PDF without additional CSS since it's all in the template
-            HTML(string=rendered).write_pdf(
-                target=tmp.name
-            )
+            # Generate PDF directly from the template without additional CSS
+            HTML(string=rendered).write_pdf(target=tmp.name)
             
             logger.info("PDF generation completed")
             
