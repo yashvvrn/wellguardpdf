@@ -226,7 +226,43 @@ def download_report():
                         font-size: 9pt;
                     }
                 }
-                body { font-family: sans-serif; }
+                body { 
+                    font-family: Arial, sans-serif;
+                    line-height: 1.6;
+                }
+                .header {
+                    text-align: center;
+                    margin-bottom: 30px;
+                    border-bottom: 2px solid #2c3e50;
+                    padding-bottom: 20px;
+                }
+                .header h1 {
+                    color: #2c3e50;
+                    margin: 0;
+                }
+                h2 {
+                    color: #2c3e50;
+                    border-bottom: 1px solid #eee;
+                    padding-bottom: 5px;
+                }
+                .content {
+                    margin-bottom: 20px;
+                }
+                ul {
+                    list-style-type: disc;
+                    padding-left: 20px;
+                }
+                li {
+                    margin-bottom: 5px;
+                }
+                .footer {
+                    text-align: center;
+                    margin-top: 50px;
+                    font-size: 12px;
+                    color: #666;
+                    border-top: 1px solid #eee;
+                    padding-top: 20px;
+                }
             ''')
             
             # Generate PDF with custom CSS
