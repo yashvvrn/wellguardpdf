@@ -6,18 +6,24 @@ services:
     plan: free
     buildCommand: |
       apt-get update && apt-get install -y \
+      build-essential \
+      python3-dev \
+      libcairo2 \
       libcairo2-dev \
+      libpango-1.0-0 \
       libpango1.0-dev \
+      libpangocairo-1.0-0 \
+      libgdk-pixbuf2.0-0 \
       libgdk-pixbuf2.0-dev \
       libffi-dev \
       shared-mime-info \
-      && pip install --upgrade pip \
-      && pip install --only-binary :all: numpy pandas scikit-learn \
+      && pip install --upgrade pip setuptools wheel \
+      && pip install --only-binary :all: numpy==1.23.5 pandas==1.5.3 scikit-learn==1.0.2 \
       && pip install --no-cache-dir -r requirements.txt
-    startCommand: gunicorn --chdir api index:app --bind 0.0.0.0:$PORT --log-file -
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --log-file -
     envVars:
       - key: PYTHON_VERSION
-        value: 3.11.0
+        value: 3.9.18
       - key: FLASK_ENV
         value: production
       - key: PORT

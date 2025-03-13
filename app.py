@@ -149,5 +149,9 @@ def download_report():
     response.headers['Content-Disposition'] = 'attachment; filename=report.pdf'
     return response
 
+@app.route('/health')
+def health_check():
+    return 'OK', 200
+
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=9000, debug=True)
