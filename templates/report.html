@@ -1,63 +1,192 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Medical Report</title>
+    <title>Medical Report - {{ result.name }}</title>
     <style>
+        @page { 
+            size: A4;
+            margin: 1.5cm;
+            @top-center {
+                content: "WellGuard Medical Report";
+                font-size: 10pt;
+                color: #2c3e50;
+            }
+            @bottom-center {
+                content: "Page " counter(page) " of " counter(pages);
+                font-size: 9pt;
+                color: #666;
+            }
+        }
+        
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
-            padding: 20px;
+            line-height: 1.6;
+            color: #333;
+            max-width: 21cm;
+            margin: 0 auto;
+            background-color: #f8f9fa;
         }
+
         .header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 2em;
+            padding: 2em;
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        .content {
-            margin-bottom: 20px;
+
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
+
+        .header p {
+            margin: 10px 0 0;
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5em;
+            margin-bottom: 1.5em;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 0.5em;
+            font-size: 20px;
+        }
+
+        .patient-info {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1em;
+        }
+
+        .patient-info p {
+            margin: 0.5em 0;
+            padding: 0.5em;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+
+        .symptoms-list {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5em;
+        }
+
+        .symptoms-list li {
+            background-color: #e9ecef;
+            padding: 0.5em 1em;
+            border-radius: 20px;
+            font-size: 14px;
+            color: #2c3e50;
+        }
+
+        .diagnosis {
+            background-color: #f8f9fa;
+            padding: 1em;
+            border-left: 4px solid #2c3e50;
+            margin: 1em 0;
+        }
+
+        .precautions-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .precautions-list li {
+            margin-bottom: 0.8em;
+            padding: 0.8em;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            border-left: 3px solid #3498db;
+        }
+
+        .advice-box {
+            background-color: #e8f4f8;
+            padding: 1em;
+            border-radius: 8px;
+            margin-top: 1em;
+        }
+
         .footer {
             text-align: center;
-            margin-top: 50px;
+            margin-top: 3em;
+            padding-top: 1.5em;
+            border-top: 1px solid #dee2e6;
+            color: #6c757d;
             font-size: 12px;
-            color: #666;
+        }
+
+        .highlight {
+            color: #2c3e50;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
     <div class="header">
         <h1>Medical Report</h1>
-        <p>Generated for: {{ result.name }}</p>
+        <p>Generated for {{ result.name }}</p>
     </div>
 
-    <div class="content">
+    <div class="card">
         <h2>Patient Information</h2>
-        <p>Name: {{ result.name }}</p>
-        <p>Duration of Symptoms: {{ result.days }} days</p>
+        <div class="patient-info">
+            <p><span class="highlight">Name:</span> {{ result.name }}</p>
+            <p><span class="highlight">Duration of Symptoms:</span> {{ result.days }} days</p>
+        </div>
+    </div>
 
+    <div class="card">
         <h2>Symptoms Reported</h2>
-        <ul>
+        <ul class="symptoms-list">
             {% for symptom in result.selected_symptoms %}
             <li>{{ symptom }}</li>
             {% endfor %}
         </ul>
+    </div>
 
+    <div class="card">
         <h2>Diagnosis</h2>
-        <p>Based on the symptoms provided, the predicted condition is: {{ result.disease }}</p>
-        <p>{{ result.description }}</p>
+        <div class="diagnosis">
+            <p><span class="highlight">Predicted Condition:</span> {{ result.disease }}</p>
+            <p>{{ result.description }}</p>
+        </div>
+    </div>
 
+    <div class="card">
         <h2>Recommended Precautions</h2>
-        <ul>
+        <ul class="precautions-list">
             {% for precaution in result.precautions %}
             <li>{{ precaution }}</li>
             {% endfor %}
         </ul>
+    </div>
 
+    <div class="card">
         <h2>Medical Advice</h2>
-        <p>{{ result.advice }}</p>
+        <div class="advice-box">
+            <p>{{ result.advice }}</p>
+        </div>
     </div>
 
     <div class="footer">
         <p>This is a computer-generated report and should not be considered as a substitute for professional medical advice.</p>
+        <p>Generated by WellGuard Health System</p>
     </div>
 </body>
 </html>

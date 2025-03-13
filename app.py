@@ -212,63 +212,9 @@ def download_report():
         
         # Create a temporary file for the PDF
         with tempfile.NamedTemporaryFile(suffix='.pdf', delete=False) as tmp:
-            # Define CSS for PDF styling
-            css = CSS(string='''
-                @page { 
-                    size: A4; 
-                    margin: 1cm;
-                    @top-center {
-                        content: "WellGuard Medical Report";
-                        font-size: 9pt;
-                    }
-                    @bottom-center {
-                        content: "Page " counter(page) " of " counter(pages);
-                        font-size: 9pt;
-                    }
-                }
-                body { 
-                    font-family: Arial, sans-serif;
-                    line-height: 1.6;
-                }
-                .header {
-                    text-align: center;
-                    margin-bottom: 30px;
-                    border-bottom: 2px solid #2c3e50;
-                    padding-bottom: 20px;
-                }
-                .header h1 {
-                    color: #2c3e50;
-                    margin: 0;
-                }
-                h2 {
-                    color: #2c3e50;
-                    border-bottom: 1px solid #eee;
-                    padding-bottom: 5px;
-                }
-                .content {
-                    margin-bottom: 20px;
-                }
-                ul {
-                    list-style-type: disc;
-                    padding-left: 20px;
-                }
-                li {
-                    margin-bottom: 5px;
-                }
-                .footer {
-                    text-align: center;
-                    margin-top: 50px;
-                    font-size: 12px;
-                    color: #666;
-                    border-top: 1px solid #eee;
-                    padding-top: 20px;
-                }
-            ''')
-            
-            # Generate PDF with custom CSS
+            # Generate PDF without additional CSS since it's all in the template
             HTML(string=rendered).write_pdf(
-                target=tmp.name,
-                stylesheets=[css]
+                target=tmp.name
             )
             
             logger.info("PDF generation completed")
