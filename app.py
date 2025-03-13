@@ -7,15 +7,43 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import train_test_split
 from weasyprint import HTML
 import os
+import sys
 
 app = Flask(__name__)
 
 # Get the absolute path to the project directory
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+print(f"Base directory: {BASE_DIR}")
+print(f"Current working directory: {os.getcwd()}")
+print(f"Directory contents: {os.listdir('.')}")
+
+def verify_data_files():
+    """Verify the existence of required data files and print their status"""
+    required_files = {
+        'Data/Training.csv': False,
+        'MasterData/symptom_severity.csv': False,
+        'MasterData/symptom_Description.csv': False,
+        'MasterData/symptom_precaution.csv': False
+    }
+    
+    for file_path in required_files:
+        full_path = os.path.join(BASE_DIR, file_path)
+        exists = os.path.isfile(full_path)
+        required_files[file_path] = exists
+        print(f"Checking {full_path}: {'EXISTS' if exists else 'MISSING'}")
+    
+    return all(required_files.values())
+
+# Verify data files before proceeding
+if not verify_data_files():
+    print("ERROR: Required data files are missing!")
+    sys.exit(1)
 
 # --- Data Loading and Model Training ---
 try:
-    training = pd.read_csv(os.path.join(BASE_DIR, 'Data', 'Training.csv'))
+    training_file = os.path.join(BASE_DIR, 'Data', 'Training.csv')
+    print(f"Loading training data from: {training_file}")
+    training = pd.read_csv(training_file)
     cols = training.columns[:-1]  # All symptom columns
     x = training[cols]
     y = training['prognosis']
@@ -32,6 +60,7 @@ try:
 
     # List of symptoms for the input vector and to populate the form
     symptoms_list = list(cols)
+    print("Successfully loaded and processed training data")
 except Exception as e:
     print(f"Error loading training data: {e}")
     raise
@@ -44,16 +73,20 @@ precautionDictionary = {}
 def load_severity_dict():
     global severityDictionary
     try:
-        with open(os.path.join(BASE_DIR, 'MasterData', 'symptom_severity.csv'), newline='', encoding='utf-8') as csv_file:
+        severity_file = os.path.join(BASE_DIR, 'MasterData', 'symptom_severity.csv')
+        print(f"Loading severity data from: {severity_file}")
+        with open(severity_file, newline='', encoding='utf-8') as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=',')
             for row in csv_reader:
                 if row:
                     symptom, severity = row[0], row[1]
                     severityDictionary[symptom] = int(severity)
+        print(f"Successfully loaded {len(severityDictionary)} severity entries")
     except Exception as e:
         print(f"Error loading severity data: {e}")
         print(f"Current directory: {os.getcwd()}")
-        print(f"Looking for file: {os.path.join(BASE_DIR, 'MasterData', 'symptom_severity.csv')}")
+        print(f"Directory contents: {os.listdir('.')}")
+        print(f"MasterData contents: {os.listdir('MasterData') if os.path.exists('MasterData') else 'MasterData NOT FOUND'}")
         raise
 
 def load_description():
