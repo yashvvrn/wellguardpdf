@@ -10,24 +10,31 @@ import os
 
 app = Flask(__name__)
 
+# Get the absolute path to the project directory
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 # --- Data Loading and Model Training ---
-training = pd.read_csv('Data/Training.csv')
-cols = training.columns[:-1]  # All symptom columns
-x = training[cols]
-y = training['prognosis']
+try:
+    training = pd.read_csv(os.path.join(BASE_DIR, 'Data', 'Training.csv'))
+    cols = training.columns[:-1]  # All symptom columns
+    x = training[cols]
+    y = training['prognosis']
 
-# Encode the prognosis labels
-le = preprocessing.LabelEncoder()
-le.fit(y)
-y_encoded = le.transform(y)
+    # Encode the prognosis labels
+    le = preprocessing.LabelEncoder()
+    le.fit(y)
+    y_encoded = le.transform(y)
 
-# Split data and train a Decision Tree classifier
-x_train, x_test, y_train, y_test = train_test_split(x, y_encoded, test_size=0.33, random_state=42)
-clf = DecisionTreeClassifier()
-clf = clf.fit(x_train, y_train)
+    # Split data and train a Decision Tree classifier
+    x_train, x_test, y_train, y_test = train_test_split(x, y_encoded, test_size=0.33, random_state=42)
+    clf = DecisionTreeClassifier()
+    clf = clf.fit(x_train, y_train)
 
-# List of symptoms for the input vector and to populate the form
-symptoms_list = list(cols)
+    # List of symptoms for the input vector and to populate the form
+    symptoms_list = list(cols)
+except Exception as e:
+    print(f"Error loading training data: {e}")
+    raise
 
 # --- Load Supplementary Data ---
 severityDictionary = {}
@@ -36,32 +43,47 @@ precautionDictionary = {}
 
 def load_severity_dict():
     global severityDictionary
-    with open('MasterData/symptom_severity.csv', newline='', encoding='utf-8') as csv_file:
-        csv_reader = csv.reader(csv_file, delimiter=',')
-        for row in csv_reader:
-            if row:
-                symptom, severity = row[0], row[1]
-                severityDictionary[symptom] = int(severity)
+    try:
+        with open(os.path.join(BASE_DIR, 'MasterData', 'symptom_severity.csv'), newline='', encoding='utf-8') as csv_file:
+            csv_reader = csv.reader(csv_file, delimiter=',')
+            for row in csv_reader:
+                if row:
+                    symptom, severity = row[0], row[1]
+                    severityDictionary[symptom] = int(severity)
+    except Exception as e:
+        print(f"Error loading severity data: {e}")
+        print(f"Current directory: {os.getcwd()}")
+        print(f"Looking for file: {os.path.join(BASE_DIR, 'MasterData', 'symptom_severity.csv')}")
+        raise
 
 def load_description():
     global description_list
-    with open('MasterData/symptom_Description.csv', newline='', encoding='utf-8') as csv_file:
-        csv_reader = csv.reader(csv_file, delimiter=',')
-        for row in csv_reader:
-            if row:
-                symptom, desc = row[0], row[1]
-                description_list[symptom] = desc
+    try:
+        with open(os.path.join(BASE_DIR, 'MasterData', 'symptom_Description.csv'), newline='', encoding='utf-8') as csv_file:
+            csv_reader = csv.reader(csv_file, delimiter=',')
+            for row in csv_reader:
+                if row:
+                    symptom, desc = row[0], row[1]
+                    description_list[symptom] = desc
+    except Exception as e:
+        print(f"Error loading description data: {e}")
+        raise
 
 def load_precaution_dict():
     global precautionDictionary
-    with open('MasterData/symptom_precaution.csv', newline='', encoding='utf-8') as csv_file:
-        csv_reader = csv.reader(csv_file, delimiter=',')
-        for row in csv_reader:
-            if row:
-                symptom = row[0]
-                precautions = row[1:5]  # Assumes 4 precaution entries per symptom
-                precautionDictionary[symptom] = precautions
+    try:
+        with open(os.path.join(BASE_DIR, 'MasterData', 'symptom_precaution.csv'), newline='', encoding='utf-8') as csv_file:
+            csv_reader = csv.reader(csv_file, delimiter=',')
+            for row in csv_reader:
+                if row:
+                    symptom = row[0]
+                    precautions = row[1:5]  # Assumes 4 precaution entries per symptom
+                    precautionDictionary[symptom] = precautions
+    except Exception as e:
+        print(f"Error loading precaution data: {e}")
+        raise
 
+# Load all data
 load_severity_dict()
 load_description()
 load_precaution_dict()
