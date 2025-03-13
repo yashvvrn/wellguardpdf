@@ -1,116 +1,63 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Medical Report - {{ result.name }}</title>
-  <style>
-    /* Set page size and margins for PDF output */
-    @page {
-      size: A4;
-      margin: 10mm;
-    }
-    body {
-      font-family: Arial, sans-serif;
-      line-height: 1.6;
-      margin: 0;
-      padding: 20px;
-    }
-    .header {
-      text-align: center;
-      margin-bottom: 30px;
-      border-bottom: 2px solid #2c3e50;
-      padding-bottom: 20px;
-    }
-    .report-title {
-      color: #2c3e50;
-      font-size: 24px;
-      margin: 0;
-    }
-    .patient-info {
-      background-color: #f8f9fa;
-      padding: 20px;
-      border-radius: 5px;
-      margin-bottom: 20px;
-    }
-    .section {
-      margin-bottom: 20px;
-    }
-    .section-title {
-      color: #2c3e50;
-      font-size: 18px;
-      margin-bottom: 10px;
-      border-bottom: 1px solid #eee;
-      padding-bottom: 5px;
-    }
-    .symptom-list {
-      list-style-type: none;
-      padding-left: 0;
-    }
-    .symptom-list li {
-      display: inline-block;
-      background-color: #e9ecef;
-      padding: 5px 10px;
-      margin: 3px;
-      border-radius: 3px;
-    }
-    .precaution-list {
-      padding-left: 20px;
-    }
-    .precaution-list li {
-      margin-bottom: 5px;
-    }
-    .footer {
-      margin-top: 40px;
-      text-align: center;
-      font-size: 12px;
-      color: #6c757d;
-    }
-  </style>
+    <title>Medical Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .content {
+            margin-bottom: 20px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
 </head>
 <body>
-  <div class="header">
-    <h1 class="report-title">WellGuard Medical Report</h1>
-    <p>Generated on {{ result.date if result.date else '' }}</p>
-  </div>
+    <div class="header">
+        <h1>Medical Report</h1>
+        <p>Generated for: {{ result.name }}</p>
+    </div>
 
-  <div class="patient-info">
-    <h2 class="section-title">Patient Information</h2>
-    <p><strong>Name:</strong> {{ result.name }}</p>
-    <p><strong>Duration of Symptoms:</strong> {{ result.days }} days</p>
-  </div>
+    <div class="content">
+        <h2>Patient Information</h2>
+        <p>Name: {{ result.name }}</p>
+        <p>Duration of Symptoms: {{ result.days }} days</p>
 
-  <div class="section">
-    <h2 class="section-title">Symptoms Reported</h2>
-    <ul class="symptom-list">
-      {% for symptom in result.selected_symptoms %}
-      <li>{{ symptom }}</li>
-      {% endfor %}
-    </ul>
-  </div>
+        <h2>Symptoms Reported</h2>
+        <ul>
+            {% for symptom in result.selected_symptoms %}
+            <li>{{ symptom }}</li>
+            {% endfor %}
+        </ul>
 
-  <div class="section">
-    <h2 class="section-title">Diagnosis</h2>
-    <p><strong>Predicted Condition:</strong> {{ result.disease }}</p>
-    <p>{{ result.description }}</p>
-  </div>
+        <h2>Diagnosis</h2>
+        <p>Based on the symptoms provided, the predicted condition is: {{ result.disease }}</p>
+        <p>{{ result.description }}</p>
 
-  <div class="section">
-    <h2 class="section-title">Recommended Precautions</h2>
-    <ul class="precaution-list">
-      {% for precaution in result.precautions %}
-      <li>{{ precaution }}</li>
-      {% endfor %}
-    </ul>
-  </div>
+        <h2>Recommended Precautions</h2>
+        <ul>
+            {% for precaution in result.precautions %}
+            <li>{{ precaution }}</li>
+            {% endfor %}
+        </ul>
 
-  <div class="section">
-    <h2 class="section-title">Medical Advice</h2>
-    <p>{{ result.advice }}</p>
-  </div>
+        <h2>Medical Advice</h2>
+        <p>{{ result.advice }}</p>
+    </div>
 
-  <div class="footer">
-    <p>This is a computer-generated report. Please consult with a healthcare professional for proper medical advice.</p>
-  </div>
+    <div class="footer">
+        <p>This is a computer-generated report and should not be considered as a substitute for professional medical advice.</p>
+    </div>
 </body>
 </html>
