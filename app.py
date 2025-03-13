@@ -15,6 +15,9 @@ import tempfile
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
+# Suppress WeasyPrint warnings
+logging.getLogger('weasyprint').setLevel(logging.ERROR)
+
 app = Flask(__name__)
 
 # Get the absolute path to the project directory
@@ -209,10 +212,29 @@ def download_report():
         
         # Create a temporary file for the PDF
         with tempfile.NamedTemporaryFile(suffix='.pdf', delete=False) as tmp:
-            # Convert rendered HTML to PDF using WeasyPrint with error handling
-            logger.info("Starting PDF generation")
-            html = HTML(string=rendered, base_url=request.url_root)
-            html.write_pdf(tmp.name)
+            # Define CSS for PDF styling
+            css = CSS(string='''
+                @page { 
+                    size: A4; 
+                    margin: 1cm;
+                    @top-center {
+                        content: "WellGuard Medical Report";
+                        font-size: 9pt;
+                    }
+                    @bottom-center {
+                        content: "Page " counter(page) " of " counter(pages);
+                        font-size: 9pt;
+                    }
+                }
+                body { font-family: sans-serif; }
+            ''')
+            
+            # Generate PDF with custom CSS
+            HTML(string=rendered).write_pdf(
+                target=tmp.name,
+                stylesheets=[css]
+            )
+            
             logger.info("PDF generation completed")
             
             # Read the generated PDF
